@@ -1,8 +1,15 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import getCommerce from '../utils/commerce'
+import Commerce from '@chec/commerce.js'
 
-export default function Home() {
+export default function Home(props) {
+
+  const {products}=props;
+
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -11,46 +18,46 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <main className="bg-white">
+        <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Customers also purchased</h2>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+          <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+            {products.map((product) => (
+              <div key={product.id} className="group relative">
+                <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+                  <Image
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+                    src={product.image.url}
+                    alt={product.name}
+                    width="100%"
+                    height="115"
+                    layout="responsive"
+                    objectFit="fill"
+                    className="w-full h-full object-center object-cover lg:w-full lg:h-full"
+                  />
+                </div>
+                <div className="mt-4 flex justify-between">
+                  <div>
+                    <h3 className="text-sm text-gray-700">
+                      <a href={product.href}>
+                        <span aria-hidden="true" className="absolute inset-0" />
+                        {product.name}
+                      </a>
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">{product.color}</p>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">{product.price.formatted_with_symbol}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
+
+
+
 
       <footer className={styles.footer}>
         <a
@@ -67,3 +74,14 @@ export default function Home() {
     </div>
   )
 }
+
+export async function getStaticProps() {
+  const commerce=getCommerce();
+  const {data: products}=await commerce.products.list();
+  return {
+    props: {
+      products,
+    },
+  };
+}
+
